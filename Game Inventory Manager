@@ -4,120 +4,101 @@
 
 using namespace std;
 
-// Item class to represent an item in the inventory
-class Item {
-    private:
-        string name;
-        int quantity;
-    
-    public:
-        Item(string name, int quantity) {
-            this->name = name;
-            this->quantity = quantity;
-        }
-        
-        string getName() {
-            return name;
-        }
-        
-        int getQuantity() {
-            return quantity;
-        }
-        
-        void addQuantity(int amount) {
-            quantity += amount;
-        }
-        
-        void removeQuantity(int amount) {
-            quantity -= amount;
-        }
-};
-
-// Inventory class to manage the inventory
 class Inventory {
-    private:
-        vector<Item> items;
-    
-    public:
-        void addItem(string name, int quantity) {
-            // Check if item already exists in inventory
-            for (Item& item : items) {
-                if (item.getName() == name) {
-                    item.addQuantity(quantity); // If yes, increase the quantity
-                    return;
-                }
-            }
-            // If not, create a new item and add it to the inventory
-            Item item(name, quantity);
+private:
+    vector<string> items;
+    int capacity;
+
+public:
+    Inventory(int maxCapacity) {
+        capacity = maxCapacity;
+    }
+
+    void addItem(const string& item) {
+        if (items.size() < capacity) {
             items.push_back(item);
+            cout << item << " added to the inventory." << endl;
+        } else {
+            cout << "Inventory is full. Cannot add more items." << endl;
         }
-        
-        void removeItem(string name, int quantity) {
-            // Find the item in the inventory
-            for (Item& item : items) {
-                if (item.getName() == name) {
-                    // Check if there is enough quantity to remove
-                    if (item.getQuantity() < quantity) {
-                        cout << "Error: Not enough " << name << " in inventory." << endl;
-                        return;
-                    }
-                    // If yes, remove the quantity
-                    item.removeQuantity(quantity);
-                    // If quantity becomes zero, remove the item from inventory
-                    if (item.getQuantity() == 0) {
-                        items.erase(remove(items.begin(), items.end(), item), items.end());
-                    }
-                    return;
-                }
-            }
-            // If item not found, print error message
-            cout << "Error: " << name << " not found in inventory." << endl;
-        }
-        
-        void showInventory() {
-            cout << "Inventory:" << endl;
-            for (Item item : items) {
-                cout << "- " << item.getName() << " (" << item.getQuantity() << ")" << endl;
+    }
+
+    void removeItem(const string& item) {
+        bool removed = false;
+        for (size_t i = 0; i < items.size(); i++) {
+            if (items[i] == item) {
+                items.erase(items.begin() + i);
+                cout << item << " removed from the inventory." << endl;
+                removed = true;
+                break;
             }
         }
+
+        if (!removed) {
+            cout << item << " not found in the inventory." << endl;
+        }
+    }
+
+    void displayInventory() {
+        cout << "Inventory:" << endl;
+        for (const string& item : items) {
+            cout << "- " << item << endl;
+        }
+    }
+
+    bool checkDuplicate(const string& item) {
+        for (const string& i : items) {
+            if (i == item) {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 int main() {
-    Inventory inventory;
+    int maxCapacity;
+    cout << "Enter maximum capacity for the inventory: ";
+    cin >> maxCapacity;
+
+    Inventory inventory(maxCapacity);
+
     char choice;
-    
+    string item;
+
     do {
-        inventory.showInventory();
         cout << endl << "Menu:" << endl;
         cout << "1. Add item" << endl;
         cout << "2. Remove item" << endl;
-        cout << "3. Quit" << endl;
+        cout << "3. Display inventory" << endl;
+        cout << "4. Quit" << endl;
         cout << "Enter choice: ";
         cin >> choice;
-        
+
         switch (choice) {
             case '1': {
-                string name;
-                int quantity;
-                cout << "Enter item name: ";
-                cin >> name;
-                cout << "Enter quantity: ";
-                cin >> quantity;
-                inventory.addItem(name, quantity);
-                cout << quantity << " " << name << "(s) added to inventory." << endl;
+                cout << "Enter item to add: ";
+                cin.ignore();
+                getline(cin, item);
+                if (inventory.checkDuplicate(item)) {
+                    cout << "Item already exists in the inventory." << endl;
+                } else {
+                    inventory.addItem(item);
+                }
                 break;
             }
             case '2': {
-                string name;
-                int quantity;
-                cout << "Enter item name: ";
-                cin >> name;
-                cout << "Enter quantity: ";
-                cin >> quantity;
-                inventory.removeItem(name, quantity);
+                cout << "Enter item to remove: ";
+                cin.ignore();
+                getline(cin, item);
+                inventory.removeItem(item);
                 break;
             }
             case '3': {
+                inventory.displayInventory();
+                break;
+            }
+            case '4': {
                 cout << "Goodbye!" << endl;
                 break;
             }
@@ -126,6 +107,8 @@ int main() {
                 break;
             }
         }
-        
-        cout << endl;
-    } while (choice !=
+
+    } while (choice != '4');
+
+    return 0;
+}
