@@ -1,0 +1,105 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+void readFile(string filename);
+void encryptFile(string filename);
+void decryptFile(string filename);
+
+int main() {
+    // Ask for the file location
+    string filename;
+    cout << "Enter the file location: ";
+    getline(cin, filename);
+
+    // Call function to read the file
+    readFile(filename);
+
+    // Call function to encrypt the file
+    encryptFile(filename);
+
+    // Call function to decrypt the file
+    decryptFile(filename);
+
+    return 0;
+}
+
+void readFile(string filename) {
+    // Open the file for reading
+    ifstream infile(filename);
+
+    // Check if the file was successfully opened
+    if (!infile.is_open()) {
+        cout << "Error opening file!" << endl;
+        exit(1);
+    }
+
+    // Read the file line by line and print it to the console
+    string line;
+    while (getline(infile, line)) {
+        cout << line << endl;
+    }
+
+    // Close the file
+    infile.close();
+}
+
+void encryptFile(string filename) {
+    // Open the file for reading and writing
+    fstream file(filename, ios::in | ios::out);
+
+    // Check if the file was successfully opened
+    if (!file.is_open()) {
+        cout << "Error opening file!" << endl;
+        exit(1);
+    }
+
+    // Prompt the user for a password to encrypt the file
+    string password;
+    cout << "Enter a password to encrypt the file: ";
+    cin >> password;
+
+    // Encrypt the file using the password
+    string line;
+    while (getline(file, line)) {
+        for (size_t i = 0; i < line.length(); i++) {
+            line[i] = line[i] ^ password[i % password.length()];
+        }
+        file.seekp(file.tellg());
+        file.write(line.c_str(), line.length());
+    }
+
+    // Close the file
+    file.close();
+}
+
+void decryptFile(string filename) {
+    // Open the file for reading and writing
+    fstream file(filename, ios::in | ios::out);
+
+    // Check if the file was successfully opened
+    if (!file.is_open()) {
+        cout << "Error opening file!" << endl;
+        exit(1);
+    }
+
+    // Prompt the user for a password to decrypt the file
+    string password;
+    cout << "Enter the password to decrypt the file: ";
+    cin >> password;
+
+    // Decrypt the file using the password
+    string line;
+    while (getline(file, line)) {
+        for (size_t i = 0; i < line.length(); i++) {
+            line[i] = line[i] ^ password[i % password.length()];
+        }
+        file.seekp(file.tellg());
+        file.write(line.c_str(), line.length());
+    }
+
+    // Close the file
+    file.close();
+}
